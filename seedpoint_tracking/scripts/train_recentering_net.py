@@ -1,9 +1,8 @@
 import argparse
 import logging
+from os import mkdir
 from os.path import join
 import sys
-
-from twitter.magicpony.common.file_access import auto_make_dir
 
 import numpy as np
 from seedpoint_tracking.training import train_recentering_net
@@ -47,7 +46,7 @@ if __name__ == '__main__':
 
   args = parser.parse_args()
 
-  auto_make_dir(args.saveDir)
+  mkdir(args.saveDir)
 
   assert np.mod(args.cropSide, 2) == 1
 

@@ -46,38 +46,39 @@ def create_random_initialisation(sigma, init_file):
     init_file_path = join(video_folder, init_file)
     # make sure file does not exist already, then open it
     assert not isfile(init_file_path), 'Initialization file already exists'
-    f = open(init_file_path, 'a')
-    print('Writing in ' + init_file_path)
-    for j in range(len(frame_name_list)):
-      bbox = region_to_bbox(gt[j, :], center=False)
-      cx = bbox[0] + bbox[2] / 2
-      cy = bbox[1] + bbox[3] / 2
-      ground_truth_width, ground_truth_height = bbox[2], bbox[3]
-      # center of the Gaussian (in frame space) is the center of the GT bbox
-      gaussian_mean = np.array([cx, cy])
-      # covariance (diagonal) matrix defined by w and h of GT bbox
-      gaussian_cov = np.array(
-        [[sigma * ground_truth_width ** 2, 0], [0, sigma * ground_truth_height ** 2]])
-      # sample one seed from the bivariate Gaussian
-      seed_x, seed_y = np.random.multivariate_normal(gaussian_mean, gaussian_cov, 1).T
-      seed_x, seed_y = seed_x[0], seed_y[0]
-      # dummy guess of target area based on frame area (avg from OTB-100)
-      guessed_target_area = np.power(np.sqrt(np.prod(frame_size)) * AVG_FRAME_TO_TARGET, 2)
-      # dummy guess of target w and h based on avg from OTB-100
-      guessed_height = np.sqrt(guessed_target_area / AVG_ASPECT_RATIO)
-      guessed_width = AVG_ASPECT_RATIO * guessed_height
-      assert guessed_width / guessed_height <= AVG_ASPECT_RATIO + EPSILON
-      assert guessed_width / guessed_height >= AVG_ASPECT_RATIO - EPSILON
-      assert np.sqrt(
-        (guessed_width * guessed_height) / np.prod(frame_size)) <= AVG_FRAME_TO_TARGET + EPSILON
-      assert np.sqrt(
-        (guessed_width * guessed_height) / np.prod(frame_size)) >= AVG_FRAME_TO_TARGET - EPSILON
-      guessed_bbox = (seed_x - guessed_width / 2, seed_y - guessed_height / 2, guessed_width,
-                      guessed_height)
-      # append to file
-      _print_to_file(guessed_bbox, f)
-    f.close()
-    print()
+
+    with open(init_file_path, 'a') as f:
+      print('Writing in ' + init_file_path)
+      for j in range(len(frame_name_list)):
+        bbox = region_to_bbox(gt[j, :], center=False)
+        cx = bbox[0] + bbox[2] / 2
+        cy = bbox[1] + bbox[3] / 2
+        ground_truth_width, ground_truth_height = bbox[2], bbox[3]
+        # center of the Gaussian (in frame space) is the center of the GT bbox
+        gaussian_mean = np.array([cx, cy])
+        # covariance (diagonal) matrix defined by w and h of GT bbox
+        gaussian_cov = np.array(
+          [[sigma * ground_truth_width ** 2, 0], [0, sigma * ground_truth_height ** 2]])
+        # sample one seed from the bivariate Gaussian
+        seed_x, seed_y = np.random.multivariate_normal(gaussian_mean, gaussian_cov, 1).T
+        seed_x, seed_y = seed_x[0], seed_y[0]
+        # dummy guess of target area based on frame area (avg from OTB-100)
+        guessed_target_area = np.power(np.sqrt(np.prod(frame_size)) * AVG_FRAME_TO_TARGET, 2)
+        # dummy guess of target w and h based on avg from OTB-100
+        guessed_height = np.sqrt(guessed_target_area / AVG_ASPECT_RATIO)
+        guessed_width = AVG_ASPECT_RATIO * guessed_height
+        assert guessed_width / guessed_height <= AVG_ASPECT_RATIO + EPSILON
+        assert guessed_width / guessed_height >= AVG_ASPECT_RATIO - EPSILON
+        assert np.sqrt(
+          (guessed_width * guessed_height) / np.prod(frame_size)) <= AVG_FRAME_TO_TARGET + EPSILON
+        assert np.sqrt(
+          (guessed_width * guessed_height) / np.prod(frame_size)) >= AVG_FRAME_TO_TARGET - EPSILON
+        guessed_bbox = (seed_x - guessed_width / 2, seed_y - guessed_height / 2, guessed_width,
+                        guessed_height)
+        # append to file
+        _print_to_file(guessed_bbox, f)
+      f.close()
+      print()
 
 
 if __name__ == '__main__':

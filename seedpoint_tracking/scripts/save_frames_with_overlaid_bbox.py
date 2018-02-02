@@ -2,9 +2,8 @@ from __future__ import division
 
 import argparse
 import csv
+from os import mkdir
 from os.path import join as join_path
-
-from twitter.magicpony.common.file_access import auto_make_dir
 
 from PIL import Image
 import numpy as np
@@ -76,6 +75,6 @@ if __name__ == '__main__':
 
   args = parser.parse_args()
 
-  auto_make_dir(args.out_dir)
+  mkdir(args.out_dir)
 
   save_frames_with_overlaid_bbox(**vars(args))
